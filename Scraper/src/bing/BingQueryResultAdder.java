@@ -1,11 +1,7 @@
 package bing;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,30 +9,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import universal.Company;
 import universal.Entry;
-import universal.EntryListToExcelWriter;
 import universal.InputList;
 import universal.QueryResultAdder;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
-
-import com.google.gson.Gson;
-
 import functions.DateManager;
-import functions.StringFormatter;
-
+@SuppressWarnings("deprecation")
 public class BingQueryResultAdder implements QueryResultAdder {
 	
-	private final int NUM_RESULTS_PER_QUERY = 14;
-	private final int NUM_QUERIES = 1;
-	private final String charset = "UTF-8";
-	private final String bingAPIUrl = "https://api.datamarket.azure.com/Data.ashx/Bing/Search/News?Query=";
+	private static final int NUM_RESULTS_PER_QUERY = 14;
+	private static final int NUM_QUERIES = 1;
+	private static final String BING_API_URL = "https://api.datamarket.azure.com/Data.ashx/Bing/Search/News?Query=";
 
 	public void addQueryResultsToEntryList(List<Entry> entryList, InputList il,
 			String searchTerm) throws IOException {
@@ -90,21 +80,21 @@ public class BingQueryResultAdder implements QueryResultAdder {
 		if(found){
 			modifiedSearch = modifiedSearch.replace(" ", "%27");
 		}
-		String url = "https://api.datamarket.azure.com/Data.ashx/Bing/Search/News?Query=" + modifiedSearch + "&$top=15&$format=Json";
+		String url = BING_API_URL + modifiedSearch + "&$top=15&$format=Json";
 		return url;
 		
 	}
 	
+	@SuppressWarnings("resource")
 	private String bingResults(String url) throws UnsupportedEncodingException, IOException {
 		HttpClient httpclient = new DefaultHttpClient();
 		String accountKey = ":1K2Nqn+/MpMy9WlqzA3A/pqHyKbJXXZacCCXo5INimY";
         byte[] accountKeyBytes = Base64.encodeBase64(accountKey.getBytes());
         String accountKeyEnc = new String(accountKeyBytes);
-        String responseBody = null;
         HttpGet httpget = new HttpGet(url);
         httpget.setHeader("Authorization", "Basic " + accountKeyEnc);
         ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        return responseBody = httpclient.execute(httpget, responseHandler);
+        return  httpclient.execute(httpget, responseHandler);
 	}
 	
 	
@@ -112,6 +102,22 @@ public class BingQueryResultAdder implements QueryResultAdder {
 	@Override
 	public String getName() {
 		return "Bing";
+	}
+	
+	public static void main(String[] args){
+		StringEscapeUtils u = new StringEscapeUtils();
+		String d = "Security firm <b>Zscaler</b> finds 28 % of Android apps request permission to read SMS <b>...</b>";
+		String s = d.replaceAll("%", "percent");
+		System.out.println(s);
+		System.out.println(URLDecoder.decode(s));
+	}
+
+
+	@Override
+	public void addQueryResultsToEntryList(List<Entry> entryList, InputList il,
+			Company company) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 
 

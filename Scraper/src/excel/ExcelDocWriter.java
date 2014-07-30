@@ -3,8 +3,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 
 import jxl.Workbook;
+import jxl.write.Number;
+import jxl.write.DateTime;
 import jxl.write.Label;
 import jxl.write.WritableHyperlink;
 import jxl.write.WritableSheet;
@@ -13,32 +16,29 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 public class ExcelDocWriter {
-	private String filePath;
+	private File file;
 	private String sheetName;
 	private WritableWorkbook workbook;
 	private WritableSheet sheet;
-	private final int FIRST_ROW = 0;
-	private int nextRow;
 	
 
-	public ExcelDocWriter(String filePath, String sheetName) throws IOException{
-		this.filePath = filePath;
+	public ExcelDocWriter(File file, String sheetName) throws IOException{
+		this.file = file;
 		this.sheetName = sheetName;
 		createDocument();
 	}
 	
-	public ExcelDocWriter(String filePath) throws IOException{
-		this.filePath = filePath;
+	public ExcelDocWriter(File file) throws IOException{
+		this.file = file;
 		sheetName = "My Sheet";
 		createDocument();
 	}
 	
 	
 	private void createDocument() throws IOException{
-		this.workbook =  Workbook.createWorkbook(new File(filePath));
+		this.workbook =  Workbook.createWorkbook(file);
 //	    this.sheet = workbook.createSheet(sheetName, 0);
 		sheet = workbook.createSheet(sheetName, 0);
-		nextRow = FIRST_ROW;
 	}
 	
 
@@ -61,11 +61,15 @@ public class ExcelDocWriter {
 		Label l = new Label(column,row,content);
 		sheet.addCell(l);
 	}
-
-	
-	private int getAndIncrementNextRow() {
-		return nextRow++;
+	public void addInt(int content, int column, int row) throws RowsExceededException, WriteException{
+		Number l = new Number(column,row,content);
+		sheet.addCell(l);
 	}
+	public void addDate(Date d, int column, int row) throws RowsExceededException, WriteException {
+		jxl.write.DateTime date = new jxl.write.DateTime(column,row,d);
+		sheet.addCell(date);
+	}
+
 
 	public void writeAndClose() throws IOException, WriteException{
 	    workbook.write(); 

@@ -1,51 +1,39 @@
 package universal;
+import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
-import functions.DateManager;
-import functions.StringFormatter;
-
 public class InputList {
-	String location;
+	File file;
 	String sheetName;
-	List<String> companyList;
+	List<Company> companyList;
 	Date start;
 	Date end;
-	private static final String prompter = ">>> ";
 
-	public static String prompt(String prompt, Scanner s) {
-		System.out.println(prompt);
-		System.out.print(prompter);
-		return s.nextLine();
-	}
+	
 
 	public void retrieveInputs() throws IOException {
 		Scanner keyboard = new Scanner(System.in);
-		location = prompt("Enter the location you would like your Excel document to be saved at:\nEx: /Users/Sam/Documents/filename.xls", keyboard);
-		start = DateManager.getDateFromString(prompt("Enter start date (dd/MM/YYYY):",keyboard));
-		end = DateManager.getDateFromString(prompt("Enter end date (dd/MM/YYYY):",keyboard));
-		sheetName = prompt("Enter your Excel Document's sheet name:\nEx: My Sheet", keyboard);
-		String rawCompanyList = prompt("Enter company names separated by commas:\nEx: Skyhigh Networks, CipherCloud", keyboard);
-//		location = "/Users/nishad/testdoc.xls";
-//		start = DateManager.getDateFromString("01/01/2014");
-//		end = DateManager.getDateFromString("23/07/2014");
-//		sheetName = "Sheet 1";
-//		String rawCompanyList = "Skyhigh Networks, CipherCloud, Netskope";
+		Prompter p = new Prompter(keyboard);
+		file = p.getFile("Enter the location you would like your Excel document to be saved at:\nEx: /Users/Sam/Documents/filename.xls");
+		start = p.getDate("Enter start date (dd/MM/YYYY):");
+		end = p.getDate("Enter end date (dd/MM/YYYY):");
+		sheetName = p.getString("Enter your Excel Document's sheet name:");
+		List<String> companyNames = p.getStringList("Enter company names separated by commas:\nEx: Skyhigh Networks, CipherCloud");
+		List<String> keywordList = null;
+		companyList = new ArrayList<Company>();
+		for(String companyName: companyNames){
+			 keywordList = p.getStringList("Enter the keywords you would like to search for with respect to "+companyName+". \n Leave blank if you are not looking for specific keywords.");
+			 companyList.add(new Company(companyName, keywordList));
+		}
 		keyboard.close();
-		companyList =  StringFormatter.fromArrayToList(rawCompanyList);
 	}
 
 
-	public List<String> getCompanyList() {
+	public List<Company> getCompanyList() {
 		return companyList;
 	}
 
@@ -60,8 +48,9 @@ public class InputList {
 	public String getSheetName(){
 		return sheetName;
 	}
-	
-	public String getFilepath(){
-		return location;
+
+
+	public File getFile() {
+		return file;
 	}
 }

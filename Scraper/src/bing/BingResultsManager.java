@@ -1,7 +1,6 @@
 package bing;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,7 +49,7 @@ public class BingResultsManager {
 	}
 
 
-	public static ArrayList<String> getAllPublishers(String results, int num) {
+	public ArrayList<String> getAllPublishers(String results, int num) {
 		 ArrayList<String> publishers = new ArrayList<String>();
 	        String mydata = results;
 	        Pattern pattern = Pattern.compile("\"Source\":\"(.*?)\"");

@@ -25,7 +25,7 @@ public class StringFormatter {
 		return sb.toString();
 	}
 
-	public static List<String> fromArrayToList(String rawCompanyList) {
+	public static List<String> fromStringToList(String rawCompanyList) {
 		List<String> list = new ArrayList<String>();
 		for(String companyName: rawCompanyList.split(",")){
 			list.add(pruneSpaces(companyName));
@@ -50,4 +50,5 @@ public class StringFormatter {
 		sb.append(runTimeMessageBorder);
 		return sb.toString();
 	}
+
 }

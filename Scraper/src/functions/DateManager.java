@@ -43,17 +43,16 @@ public class DateManager {
 	}
 	
 
-	public static Date getDateFromString(String startDate) {
+	public static Date getDateFromString(String startDate) throws ParseException {
 		Calendar mydate = new GregorianCalendar();
 		Date start = null;
 		DateFormat sourceFormat = new SimpleDateFormat("dd/MM/yyyy");
-		try {
-			start = sourceFormat.parse(startDate);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		start = sourceFormat.parse(startDate);
 		mydate.setTime(start);
 		return mydate.getTime();
+	}
+
+	public static boolean checkBeforeRange(Date articleDate, Date startDate) {
+		return articleDate.before(startDate);
 	}
 }

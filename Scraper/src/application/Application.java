@@ -1,17 +1,13 @@
 package application;
 
 import functions.StringFormatter;
-import functions.DateManager;
 import google.GoogleQueryResultAdder;
-import google.GoogleResults;
-import google.GoogleResultsManager;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import bing.BingQueryResultAdder;
-import bing.BingResults;
-import bing.BingResultsManager;
+import universal.Company;
 import universal.Entry;
 import universal.EntryListToExcelWriter;
 import universal.InputList;
@@ -25,21 +21,21 @@ public class Application {
 		
 		 // construct QueryResultAdders for each Search Engine
 		QueryResultAdder googleAdder = new GoogleQueryResultAdder();
-		QueryResultAdder bingAdder = new BingQueryResultAdder();
+//		QueryResultAdder bingAdder = new BingQueryResultAdder();
 			
 		List<QueryResultAdder> resultAdders = new ArrayList<QueryResultAdder>();
 		resultAdders.add(googleAdder);
-		resultAdders.add(bingAdder);
+//		resultAdders.add(bingAdder);
 
 		InputList il = new InputList();
 		il.retrieveInputs();
 		List<Entry> entryList = new ArrayList<Entry>();
 		
 		for(QueryResultAdder qra: resultAdders){
-			for (String searchTerm : il.getCompanyList()) {
-				System.out.println(StringFormatter.makeRunTimeMessage("Beginning "+qra.getName()+" search for: "+searchTerm));
-				qra.addQueryResultsToEntryList(entryList, il, searchTerm);
-				System.out.println(StringFormatter.makeRunTimeMessage("Finished "+qra.getName()+" search for: "+searchTerm));
+			for (Company company : il.getCompanyList()) {
+				System.out.println(StringFormatter.makeRunTimeMessage("Beginning "+qra.getName()+" search for: "+company.getName()));
+				qra.addQueryResultsToEntryList(entryList, il, company);
+				System.out.println(StringFormatter.makeRunTimeMessage("Finished "+qra.getName()+" search for: "+company.getName()));
 			}
 		}
 		
@@ -47,6 +43,6 @@ public class Application {
 		EntryListToExcelWriter writer = new EntryListToExcelWriter();
 		writer.writeEntriesToDoc(entryList, il);
 		
-		System.out.println(StringFormatter.makeRunTimeMessage("Search complete, results saved at "+il.getFilepath()));
+		System.out.println(StringFormatter.makeRunTimeMessage("Search complete, results saved at "+il.getFile().getAbsolutePath()));
 	}
 }
