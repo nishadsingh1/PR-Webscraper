@@ -99,7 +99,7 @@ public class BingQueryResultAdder implements QueryResultAdder {
 	
 	
 	
-	@Override
+
 	public String getName() {
 		return "Bing";
 	}
@@ -113,7 +113,7 @@ public class BingQueryResultAdder implements QueryResultAdder {
 	}
 
 
-	@Override
+
 	public void addQueryResultsToEntryList(List<Entry> entryList, InputList il,
 			Company company) throws IOException {
 		// TODO Auto-generated method stub
