@@ -85,7 +85,7 @@ public class GoogleQueryResultAdder implements QueryResultAdder {
 		return url;
 	}
 
-
+	@Override
 	public String getName() {
 		return "Google";
 	}

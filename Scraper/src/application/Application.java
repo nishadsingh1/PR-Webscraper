@@ -21,11 +21,11 @@ public class Application {
 		
 		 // construct QueryResultAdders for each Search Engine
 		QueryResultAdder googleAdder = new GoogleQueryResultAdder();
-//		QueryResultAdder bingAdder = new BingQueryResultAdder();
+		QueryResultAdder bingAdder = new BingQueryResultAdder();
 			
 		List<QueryResultAdder> resultAdders = new ArrayList<QueryResultAdder>();
 		resultAdders.add(googleAdder);
-//		resultAdders.add(bingAdder);
+		resultAdders.add(bingAdder);
 
 		InputList il = new InputList();
 		il.retrieveInputs();

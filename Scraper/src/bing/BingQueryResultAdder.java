@@ -21,22 +21,37 @@ import universal.Entry;
 import universal.InputList;
 import universal.QueryResultAdder;
 import functions.DateManager;
-@SuppressWarnings("deprecation")
+import functions.StringFormatter;
+
 public class BingQueryResultAdder implements QueryResultAdder {
 	
 	private static final int NUM_RESULTS_PER_QUERY = 14;
 	private static final int NUM_QUERIES = 1;
 	private static final String BING_API_URL = "https://api.datamarket.azure.com/Data.ashx/Bing/Search/News?Query=";
 
-	public void addQueryResultsToEntryList(List<Entry> entryList, InputList il,
-			String searchTerm) throws IOException {
+	public void addQueryResultsToEntryList(List<Entry> entryList, InputList il,Company company){
+		String companyName = company.getName();
+		makeSearch(entryList, StringFormatter.addParens(companyName), il, companyName, "");
+		for(String keyword: company.getKeywords()){
+			makeSearch(entryList, StringFormatter.addParens(companyName)+"+"+StringFormatter.addParens(keyword), il, companyName, keyword);
+		}
+	}
+	
+	public void makeSearch(List<Entry> entryList,String searchTerm, InputList il,
+			 String companyName, String keyword) {
 		
 		Entry entry;
 		BingResultsManager brm;
 		
 		for (int x = 0; x < NUM_QUERIES; x++) {
-			String url = getUrl(searchTerm);
-			String results = bingResults(url);
+			String url = getUrl(companyName,keyword);
+			String results = null;
+			try {
+				results = bingResults(url);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			brm = new BingResultsManager(results);
 			ArrayList<String> urls = brm.getAllUrls(results, NUM_RESULTS_PER_QUERY);
 			ArrayList<String> titles = brm.getAllTitles(results, NUM_RESULTS_PER_QUERY);
@@ -48,19 +63,13 @@ public class BingQueryResultAdder implements QueryResultAdder {
 					Date articleDate = DateManager.setArticleDate(dates.get(i),getName());
 					if(DateManager.checkWithinDateRange(articleDate, il.getStartDate(), il.getEndDate())){
 						entry = new Entry();
-						//set url
 						entry.setUrl(urls.get(i));
-						//set title, probs issue here
 						entry.setTitle(titles.get(i));
-						//set publisher
 						entry.setPublisher(publishers.get(i));
-						//set date
 						entry.setDate(articleDate);
-						//set company
-						entry.setCompany(searchTerm);
-						//set engine
+						entry.setCompany(companyName);
+						entry.setKeyword(keyword);
 						entry.setEngine(brm.getEngine());
-						//add to list
 						entryList.add(entry);
 					}
 				}catch(Exception e){
@@ -72,14 +81,18 @@ public class BingQueryResultAdder implements QueryResultAdder {
 	}
 	
 	
-	private String getUrl(String search){
-		String modifiedSearch = "%27" + search + "%27";
-		Pattern pattern = Pattern.compile("\\s");
-		Matcher matcher = pattern.matcher(modifiedSearch);
-		boolean found = matcher.find();
-		if(found){
-			modifiedSearch = modifiedSearch.replace(" ", "%27");
+	private String getUrl(String search, String keyword){
+		search = "%27"+search+"%27";
+		if(!keyword.equals("")){
+			search+="+%27"+keyword+"%27";
 		}
+//		Pattern pattern = Pattern.compile("\\s");
+//		Matcher matcher = pattern.matcher(modifiedSearch);
+//		boolean found = matcher.find();
+//		if(found){
+//			modifiedSearch = modifiedSearch.replace(" ", "%27");
+//		}
+		String modifiedSearch = search.replaceAll(" ", "%27");
 		String url = BING_API_URL + modifiedSearch + "&$top=15&$format=Json";
 		return url;
 		
@@ -99,7 +112,7 @@ public class BingQueryResultAdder implements QueryResultAdder {
 	
 	
 	
-
+	@Override
 	public String getName() {
 		return "Bing";
 	}
@@ -110,14 +123,6 @@ public class BingQueryResultAdder implements QueryResultAdder {
 		String s = d.replaceAll("%", "percent");
 		System.out.println(s);
 		System.out.println(URLDecoder.decode(s));
-	}
-
-
-
-	public void addQueryResultsToEntryList(List<Entry> entryList, InputList il,
-			Company company) throws IOException {
-		// TODO Auto-generated method stub
-		
 	}
 
 
